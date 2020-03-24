@@ -324,3 +324,78 @@ for state in states:
 #forecast_region('Queensland', 'Australia', 50)
 #forecast = forecast_region('FL', 'USA', 50)
 
+def output_to_json(forecast):
+    """
+    Takes in forecase dataframe, outputs json formatted as needed.
+    :param forecast:
+    :return:
+    """
+    json_data = []
+
+    # Loop rows in pandas dataframe.  For each row, add to list.
+    for idx, row in forecast.iterrows():
+        row_data = ([
+            # Date
+            row.Date.strftime("%m/%d/%y").replace("/0", "/"),
+
+            # R naught
+            str(row.EffR0),
+
+            # Beginning Susceptible, comma formatted
+            f"{row.BegSusceptible:,}",
+
+            # New infected
+            str(row.NewInf),
+
+            # Prev infected
+            str(row.PrevInf),
+
+            # Recovered or Died
+            str(row.RecovorDied),
+
+            # End Susceptible, comma formatted
+            f"{row.EndSusceptible:,}",
+
+            # Actual reported
+            str(row.ActualReported),
+
+            # Predicted Hospitalized
+            str(row.PredHosp),
+
+            # Cumulative Infected
+            str(row.CumInf),
+
+            # Cumulative Deaths
+            str(row.CumDeaths),
+
+            # Available Hospital Beds
+            str(row.AvailHospBeds),
+
+            # S&P 500
+            str(row.SandP500),
+
+            # Predicted Chance of, formatted as string(float) with %
+            '{}%'.format(round(float(row.PredChanceofInf), 4)),
+
+            # Estimated Chance of Infection, formatted as string(float) with %
+            '{}%'.format(round(float(row.EstActualChanceofInf), 4)),
+
+            # Cumulative predicted Chance of Infection, formatted as string(float) with %
+            '{}%'.format(round(float(row.CumPredChanceofInf), 4)),
+
+            # Unsure what this is, value is beg susceptible + prev infected.
+            f"{row.BegSusceptible + row.PrevInf:,}",
+
+            # R0, '' if 0.
+            str(''.format(row.R0).replace('0', '')),
+
+            # Percent Susceptible, formatted as string.
+            '{}%'.format(row.percentSusceptible)])
+
+        # Append all rows to json data.
+        json_data.append(row_data)
+
+    # Create .json file with json data.
+    with open('results/json/{}.json'.format(state), 'w+') as f:
+        json.dump(json_data, f)
+
